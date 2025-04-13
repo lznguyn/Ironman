@@ -32,4 +32,19 @@ $(document).ready(function () {
       sync: true,
     },
   });
+
+  //Microphone animation
+  $("#MicBtn").click(function (e) {
+    eel.playAssistantSound();
+    $("#Oval").attr("hidden", true);
+    $("#SiriWave").attr("hidden", false);
+  });
+  // Tắt Siri/micro khi nhấn vào bất kỳ nơi nào trên màn hình
+  $(document).click(function (e) {
+    // Kiểm tra nếu click không phải là trên nút microphone
+    if (!$(e.target).closest("#MicBtn").length) {
+      $("#SiriWave").attr("hidden", true);
+      $("#Oval").attr("hidden", false);
+    }
+  });
 });
