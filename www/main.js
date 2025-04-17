@@ -38,7 +38,7 @@ $(document).ready(function () {
     eel.playAssistantSound();
     $("#Oval").attr("hidden", true);
     $("#SiriWave").attr("hidden", false);
-    eel.takecommand()();
+    eel.allcommand()();
   });
   // Tắt Siri/micro khi nhấn vào bất kỳ nơi nào trên màn hình
   $(document).click(function (e) {
