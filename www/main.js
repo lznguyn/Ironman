@@ -48,4 +48,14 @@ $(document).ready(function () {
       $("#Oval").attr("hidden", false);
     }
   });
+
+  function doc_keyUp(e) {
+    if (e.key === "j" && e.metaKey) {
+      eel.playAssistantSound();
+      $("Oval").attr("hidden", true);
+      $("#SiriWave").attr("hidden", false);
+      eel.allcommand()();
+    }
+  }
+  document.addEventListener("keyup", doc_keyUp, false);
 });
