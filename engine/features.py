@@ -1,7 +1,8 @@
-from playsound import playsound
+from playsound import playsound   
+from shlex import quote          
 import eel
 from engine.config import ASSISTANT_NAME
-from engine.helper import extract_search_term
+from engine.helper import extract_search_term, remove_words
 from engine.command import speak
 import os
 import pyaudio
@@ -11,6 +12,8 @@ import webbrowser
 import sqlite3
 import pvporcupine
 import time
+import subprocess
+import pyautogui
 con = sqlite3.connect("jarvis.db")
 cursor = con.cursor()
 
@@ -84,3 +87,45 @@ def hotWord():
             audio_stream.close()
         if paud is not None:
             paud.terminate()
+
+
+def findContact(query):
+    words_to_remove = ['make', 'a', 'phone', 'call', 'to', 'send', 'message', 'whatsapp']
+    query = remove_words(query, words_to_remove)
+    try:
+        query = query.strip().lower()
+        cursor.exucute('SELECT mobile_no FROM contacts WHERE LOWER(name) LIKE ? OR LOWER(name) LIKE ?', ('%' + query + '%', '%' + query + '%'))
+        results = cursor.fetchall()
+        print(results[0][0])
+        mobile_number_str = str(results[0][0])
+        if not mobile_number_str.startswith('+84'):
+            mobile_number_str = '+84' + mobile_number_str
+        return mobile_number_str, query
+    except:
+        speak('The contact is not in the list')
+        return 0,0
+def whatapps(mobile_no, message, flag, name):
+    if flag == 'message':
+        target_tab = 12
+        jarvis_message = "Sending message to " + name
+    elif flag == 'call':
+        target_tab = 7
+        message = ''
+        jarvis_message = "Calling " + name
+    else:
+        target_tab = 6
+        message = ''
+        jarvis_message = 'Starting a video call with ' + name
+    
+    encoded_message = quote(message)
+
+    whatapps_url = f"whatsapp://send?phone={mobile_no}&text={encoded_message}"
+    full_command = f'start """{whatapps_url}"'
+    subprocess.run(full_command, shell = True)
+    time.sleep(5)
+    subprocess.run(full_command, shell = True)
+    pyautogui.hotkey('ctrl','f')
+    for i in range(target_tab):
+        pyautogui.hotkey('tab')
+    pyautogui.hotkey('enter')
+    speak(jarvis_message)    
